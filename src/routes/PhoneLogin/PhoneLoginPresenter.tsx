@@ -53,7 +53,15 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-const PhoneLoginPresenter = () => (
+interface IProps {
+  countryCode: string;
+  phoneNumber: string;
+}
+
+const PhoneLoginPresenter: React.SFC<IProps> = ({
+  countryCode,
+  phoneNumber,
+}) => (
   <Container>
     <Helmet>
       <title>Phone Login | Number</title>
@@ -68,7 +76,7 @@ const PhoneLoginPresenter = () => (
       ))}
     </CountrySelect>
     <Form>
-      <Input placeholder={"02 406 4149"} />
+      <Input placeholder={"02 406 4149"} value={phoneNumber} />
       <Button>
         <svg
           xmlns="http://www.w3.org/2000/svg"
