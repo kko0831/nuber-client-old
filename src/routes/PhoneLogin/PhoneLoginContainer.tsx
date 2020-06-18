@@ -49,10 +49,11 @@ class PhoneLoginContainer extends React.Component<
         {(mutation, { loading }) => {
           const onSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
             event.preventDefault();
+
             const phone = `${countryCode}${phoneNumber}`;
             const isValid = /^\+[1-9]{1}[0-9]{7,11}$/.test(phone);
             if (isValid) {
-              // mutation();
+              mutation();
               history.push({
                 pathname: "/verify-phone",
                 state: {
