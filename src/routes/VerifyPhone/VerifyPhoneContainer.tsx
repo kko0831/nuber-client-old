@@ -11,6 +11,8 @@ interface IProps extends RouteComponentProps<any> {}
 class VerifyPhoneContainer extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
+    // tslint:disable-next-line
+    console.log(props);
     try {
       Object.hasOwnProperty.call(props.location.state, "phone");
     } catch (e) {
