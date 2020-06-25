@@ -1,7 +1,12 @@
 import React from "react";
+import { MutationFn } from "react-apollo";
 import { Link } from "react-router-dom";
 import styled from "../../typed-components";
-import { userProfile, userProfile_GetMyProfile } from "../../types/api";
+import {
+  toggleDriving,
+  userProfile,
+  userProfile_GetMyProfile,
+} from "../../types/api";
 
 const Container = styled.div`
   height: 100%;
@@ -72,39 +77,49 @@ const ToggleDriving = styled<any>("button")`
 `;
 
 interface IProps {
-  data?: userProfile | undefined;
+  data?: userProfile;
   loading: boolean;
+  ToggleDrivingMutation: MutationFn<toggleDriving>;
 }
 
-const MenuPresenter: React.SFC<IProps> = (data, loading) => {
-  const GetMyProfile = data.data;
+const MenuPresenter: React.SFC<IProps> = ({
+  data,
+  loading,
+  ToggleDrivingMutation,
+}) => {
+  const GetMyProfile = data;
   if (GetMyProfile) {
     const response: userProfile_GetMyProfile = GetMyProfile.GetMyProfile;
     if (response && response.ok && response.user) {
       const user = response.user;
       return (
         <Container>
-          <Header>
-            <Grid>
-              <Link to={"/edit-account"}>
-                <Image
-                  src={
-                    user.profilePhoto ||
-                    "https://yt3.ggpht.com/-CTwXMuZRaWw/AAAAAAAAAAI/AAAAAAAAAAA/HTJy-KJ4F2c/s88-c-k-no-mo-rj-c0xffffff/photo.jpg"
-                  }
-                />
-              </Link>
-              <Text>
-                <Name>{user.fullName}</Name>
-                <Rating>4.5</Rating>
-              </Text>
-            </Grid>
-          </Header>
-          <SLink to="/trips">Your Trips</SLink>
-          <SLink to="/settings">Settings</SLink>
-          <ToggleDriving isDriving={user.isDriving}>
-            {user.isDriving ? "Stop driving" : "Start driving"}
-          </ToggleDriving>
+          <React.Fragment>
+            <Header>
+              <Grid>
+                <Link to={"/edit-account"}>
+                  <Image
+                    src={
+                      user.profilePhoto ||
+                      "https://yt3.ggpht.com/-CTwXMuZRaWw/AAAAAAAAAAI/AAAAAAAAAAA/HTJy-KJ4F2c/s88-c-k-no-mo-rj-c0xffffff/photo.jpg"
+                    }
+                  />
+                </Link>
+                <Text>
+                  <Name>{user.fullName}</Name>
+                  <Rating>4.5</Rating>
+                </Text>
+              </Grid>
+            </Header>
+            <SLink to="/trips">Your Trips</SLink>
+            <SLink to="/settings">Settings</SLink>
+            <ToggleDriving
+              onClick={ToggleDrivingMutation}
+              isDriving={user.isDriving}
+            >
+              {user.isDriving ? "Stop driving" : "Start driving"}
+            </ToggleDriving>
+          </React.Fragment>
         </Container>
       );
     } else {
