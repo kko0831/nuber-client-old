@@ -108,12 +108,18 @@ class EditAccountContainer extends React.Component<IProps, IState> {
       formData.append("api_key", "881266467358259");
       formData.append("upload_preset", "t8o38i7i");
       formData.append("timestamp", String(Date.now() / 1000));
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/dfeoatcmm/image/upload",
+      const {
+        data: { secure_url },
+      } = await axios.post(
+        "https://api.cloudinary.com/v1_1/dgggcrkxq/image/upload",
         formData
       );
-      // tslint:disable-next-line
-      console.log(response);
+      if (secure_url) {
+        this.setState({
+          profilePhoto: secure_url,
+          uploading: false,
+        });
+      }
     }
 
     this.setState({
