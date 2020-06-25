@@ -1,8 +1,14 @@
 import React from "react";
-import { Query } from "react-apollo";
+import { Mutation, Query } from "react-apollo";
 import { RouteComponentProps } from "react-router-dom";
+import { toast } from "react-toastify";
 import { USER_PROFILE } from "../../sharedQueries.queries";
-import { userProfile } from "../../types/api";
+import {
+  updateProfile,
+  updateProfileVariables,
+  userProfile,
+} from "../../types/api";
+import { UPDATE_PROFILE } from "./EditAccount.queries";
 import EditAccountPresenter from "./EditAccountPresenter";
 
 interface IState {
@@ -17,6 +23,11 @@ interface IProps extends RouteComponentProps<any> {}
 
 class ProfileQuery extends Query<userProfile> {}
 
+class UpdateProfileMutation extends Mutation<
+  updateProfile,
+  updateProfileVariables
+> {}
+
 class EditAccountContainer extends React.Component<IProps, IState> {
   public state = {
     email: "",
@@ -29,16 +40,42 @@ class EditAccountContainer extends React.Component<IProps, IState> {
   public render() {
     const { email, firstName, lastName, profilePhoto, loading } = this.state;
     return (
-      <ProfileQuery query={USER_PROFILE} onCompleted={this.updateFields}>
+      <ProfileQuery
+        query={USER_PROFILE}
+        onCompleted={this.updateFields}
+        fetchPolicy="no-cache"
+      >
         {() => (
-          <EditAccountPresenter
-            email={email}
-            firstName={firstName}
-            lastName={lastName}
-            profilePhoto={profilePhoto}
-            onInputChange={this.onInputChange}
-            loading={loading}
-          />
+          <UpdateProfileMutation
+            mutation={UPDATE_PROFILE}
+            variables={{
+              email,
+              firstName,
+              lastName,
+              profilePhoto,
+            }}
+            refetchQueries={[{ query: USER_PROFILE }]}
+            onCompleted={(data) => {
+              const { UpdateMyProfile } = data;
+              if (UpdateMyProfile.ok) {
+                toast.success("Profile updated!");
+              } else if (UpdateMyProfile.error) {
+                toast.error(UpdateMyProfile.error);
+              }
+            }}
+          >
+            {(updateProfileMutation, { loading: updateLoading }) => (
+              <EditAccountPresenter
+                email={email}
+                firstName={firstName}
+                lastName={lastName}
+                profilePhoto={profilePhoto}
+                onInputChange={this.onInputChange}
+                loading={updateLoading || loading}
+                onSubmit={() => updateProfileMutation()}
+              />
+            )}
+          </UpdateProfileMutation>
         )}
       </ProfileQuery>
     );
