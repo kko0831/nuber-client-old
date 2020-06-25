@@ -1,3 +1,4 @@
+import axios from "axios";
 import React from "react";
 import { Mutation, Query } from "react-apollo";
 import { RouteComponentProps } from "react-router-dom";
@@ -17,6 +18,7 @@ interface IState {
   email: string;
   profilePhoto: string;
   loading: boolean;
+  uploading: boolean;
 }
 
 interface IProps extends RouteComponentProps<any> {}
@@ -35,10 +37,18 @@ class EditAccountContainer extends React.Component<IProps, IState> {
     lastName: "",
     loading: true,
     profilePhoto: "",
+    uploading: false,
   };
 
   public render() {
-    const { email, firstName, lastName, profilePhoto, loading } = this.state;
+    const {
+      email,
+      firstName,
+      lastName,
+      profilePhoto,
+      loading,
+      uploading,
+    } = this.state;
     return (
       <ProfileQuery
         query={USER_PROFILE}
@@ -73,6 +83,7 @@ class EditAccountContainer extends React.Component<IProps, IState> {
                 onInputChange={this.onInputChange}
                 loading={updateLoading || loading}
                 onSubmit={() => updateProfileMutation()}
+                uploading={uploading}
               />
             )}
           </UpdateProfileMutation>
@@ -81,12 +92,29 @@ class EditAccountContainer extends React.Component<IProps, IState> {
     );
   }
 
-  public onInputChange: React.ChangeEventHandler<HTMLInputElement> = (
+  public onInputChange: React.ChangeEventHandler<HTMLInputElement> = async (
     event
   ) => {
     const {
-      target: { name, value },
+      target: { name, value, files },
     } = event;
+
+    if (files) {
+      this.setState({
+        uploading: true,
+      });
+      const formData = new FormData();
+      formData.append("file", files[0]);
+      formData.append("api_key", "881266467358259");
+      formData.append("upload_preset", "t8o38i7i");
+      formData.append("timestamp", String(Date.now() / 1000));
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/dfeoatcmm/image/upload",
+        formData
+      );
+      // tslint:disable-next-line
+      console.log(response);
+    }
 
     this.setState({
       [name]: value,
