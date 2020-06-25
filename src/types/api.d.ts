@@ -103,8 +103,12 @@ export interface verfiyPhoneVariables {
 
 export interface userProfile_GetMyProfile_user {
   __typename: "User";
+  id: number;
   profilePhoto: string | null;
   fullName: string | null;
+  firstName: string;
+  lastName: string;
+  email: string | null;
   isDriving: boolean;
 }
 
