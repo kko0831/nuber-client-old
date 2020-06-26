@@ -13,6 +13,29 @@ class FIndAddressContainer extends React.Component<any> {
   }
 
   public componentDidMount() {
+    navigator.geolocation.getCurrentPosition(
+      this.handleGeoSuccess,
+      this.handleGeoError
+    );
+  }
+
+  public render() {
+    return <FindAddressPresenter mapRef={this.mapRef} />;
+  }
+
+  public handleGeoSuccess: PositionCallback = (position: Position) => {
+    const {
+      coords: { latitude, longitude },
+    } = position;
+    this.loadMap(latitude, longitude);
+  };
+
+  public handleGeoError: PositionErrorCallback = () => {
+    // tslint:disable-next-line
+    console.error("No Position");
+  };
+
+  public loadMap = (lat, lng) => {
     const { google } = this.props;
     const maps = google.maps;
     const mapNode = ReactDOM.findDOMNode(this.mapRef.current);
@@ -26,18 +49,14 @@ class FIndAddressContainer extends React.Component<any> {
     console.log(mapNode === this.mapRef.current);
     const mapConfig: google.maps.MapOptions = {
       center: {
-        lat: 37.4898,
-        lng: 127.113,
+        lat,
+        lng,
       },
       disableDefaultUI: true,
       zoom: 11,
     };
     this.map = new maps.Map(mapNode, mapConfig);
-  }
-
-  public render() {
-    return <FindAddressPresenter mapRef={this.mapRef} />;
-  }
+  };
 }
 
 export default FIndAddressContainer;
