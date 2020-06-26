@@ -23,6 +23,57 @@ export interface toggleDriving {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: editPlace
+// ====================================================
+
+export interface editPlace_EditPlace {
+  __typename: "EditPlaceResponse";
+  ok: boolean;
+  error: string | null;
+}
+
+export interface editPlace {
+  EditPlace: editPlace_EditPlace;
+}
+
+export interface editPlaceVariables {
+  PlaceId: number;
+  isFav?: boolean | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: addPlace
+// ====================================================
+
+export interface addPlace_AddPlace {
+  __typename: "AddPlaceResponse";
+  ok: boolean;
+  error: string | null;
+}
+
+export interface addPlace {
+  AddPlace: addPlace_AddPlace;
+}
+
+export interface addPlaceVariables {
+  name: string;
+  lat: number;
+  lng: number;
+  address: string;
+  isFav: boolean;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL mutation operation: updateProfile
 // ====================================================
 
