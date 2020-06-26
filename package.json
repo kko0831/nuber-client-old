@@ -14,6 +14,8 @@
     "@types/styled-components": "4.1.0",
     "apollo-boost": "0.3.1",
     "axios": "0.18.0",
+    "dotenv": "8.0.0",
+    "google-maps-react": "2.0.2",
     "graphql": "14.2.1",
     "react": "16.8.6",
     "react-apollo": "2.5.5",
@@ -54,6 +56,8 @@
   },
   "devDependencies": {
     "@types/axios": "0.14.0",
+    "@types/dotenv": "6.1.1",
+    "@types/googlemaps": "3.36.0",
     "@types/react-sidebar": "3.0.0",
     "@types/react-toastify": "4.0.2",
     "tslint": "^5.2.0",

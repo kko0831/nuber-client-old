@@ -1,4 +1,5 @@
 import axios from "axios";
+import dotenv from "dotenv";
 import React from "react";
 import { Mutation, Query } from "react-apollo";
 import { RouteComponentProps } from "react-router-dom";
@@ -11,6 +12,13 @@ import {
 } from "../../types/api";
 import { UPDATE_PROFILE } from "./EditAccount.queries";
 import EditAccountPresenter from "./EditAccountPresenter";
+
+dotenv.config();
+
+const {
+  REACT_APP_CLOUDINARY_API_KEY,
+  REACT_APP_CLOUDINARY_STORAGE,
+} = process.env;
 
 interface IState {
   firstName: string;
@@ -105,15 +113,12 @@ class EditAccountContainer extends React.Component<IProps, IState> {
       });
       const formData = new FormData();
       formData.append("file", files[0]);
-      formData.append("api_key", "881266467358259");
+      formData.append("api_key", REACT_APP_CLOUDINARY_API_KEY || "");
       formData.append("upload_preset", "t8o38i7i");
       formData.append("timestamp", String(Date.now() / 1000));
       const {
         data: { secure_url },
-      } = await axios.post(
-        "https://api.cloudinary.com/v1_1/dgggcrkxq/image/upload",
-        formData
-      );
+      } = await axios.post(REACT_APP_CLOUDINARY_STORAGE || "", formData);
       if (secure_url) {
         this.setState({
           profilePhoto: secure_url,

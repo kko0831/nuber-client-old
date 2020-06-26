@@ -1,8 +1,11 @@
 import BackArrow from "components/BackArrow";
+import dotenv from "dotenv";
 import React from "react";
 import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
 import Helmet from "react-helmet";
 import styled from "../../typed-components";
+
+dotenv.config();
 
 const Container = styled.div`
   margin-top: 30px;
@@ -41,7 +44,7 @@ const socialLoginPresenter: React.SFC<IProps> = ({ loginCallback }) => (
     <Title>Choose an account</Title>
     <BackArrowExtended backTo={"/"} />
     <FacebookLogin
-      appId="594162471510048"
+      appId={process.env.REACT_APP_FACEBOOK_API_KEY || ""}
       autoLoad={false}
       fields="name,first_name,last_name,email"
       callback={loginCallback}
