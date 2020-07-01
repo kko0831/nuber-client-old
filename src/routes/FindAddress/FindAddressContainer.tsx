@@ -5,11 +5,17 @@ import FindAddressPresenter from "./FindAddressPresenter";
 interface IState {
   lat: number;
   lng: number;
+  address: string;
 }
 
 class FIndAddressContainer extends React.Component<any, IState> {
   public mapRef: any;
   public map: google.maps.Map | null;
+  public state = {
+    address: "",
+    lat: 0,
+    lng: 0,
+  };
 
   constructor(props) {
     super(props);
@@ -25,7 +31,15 @@ class FIndAddressContainer extends React.Component<any, IState> {
   }
 
   public render() {
-    return <FindAddressPresenter mapRef={this.mapRef} />;
+    const { address } = this.state;
+    return (
+      <FindAddressPresenter
+        mapRef={this.mapRef}
+        address={address}
+        onInputChange={this.onInputChange}
+        onInputBlur={this.onInputBlur}
+      />
+    );
   }
 
   public handleGeoSuccess: PositionCallback = (position: Position) => {
@@ -81,6 +95,22 @@ class FIndAddressContainer extends React.Component<any, IState> {
       lat,
       lng,
     });
+  };
+
+  public onInputChange: React.ChangeEventHandler<HTMLInputElement> = (
+    event
+  ) => {
+    const {
+      target: { name, value },
+    } = event;
+    this.setState({
+      [name]: value,
+    } as any);
+  };
+
+  public onInputBlur = () => {
+    // tslint:disable-next-line
+    console.log("Address update!");
   };
 }
 
