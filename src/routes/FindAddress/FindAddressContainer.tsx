@@ -111,11 +111,23 @@ class FIndAddressContainer extends React.Component<any, IState> {
     } as any);
   };
 
-  public onInputBlur = () => {
+  public onInputBlur = async () => {
+    if (!this.map) {
+      return;
+    }
     // tslint:disable-next-line
     console.log("Address update!");
     const { address } = this.state;
-    getCode(address);
+    const result = await getCode(address);
+    if (result !== false) {
+      const { lat, lng, formatted_address } = result;
+      this.setState({
+        address: formatted_address,
+        lat,
+        lng,
+      });
+      this.map.panTo({ lat, lng });
+    }
   };
 
   public reverseGeocodeAddress = async (lat: number, lng: number) => {
