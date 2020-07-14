@@ -73,7 +73,18 @@ class HomeContainer extends React.Component<IProps, IState> {
     return (
       <ProfileQuery query={USER_PROFILE}>
         {({ data, loading: profileLoading }) => (
-          <NearbyQuery query={GET_NEARBY_DRIVERS}>
+          <NearbyQuery
+            query={GET_NEARBY_DRIVERS}
+            skip={
+              !!(
+                data &&
+                data.GetMyProfile &&
+                data.GetMyProfile.user &&
+                data.GetMyProfile.user.isDriving
+              )
+            }
+            onCompleted={this.handleNearbyDrivers}
+          >
             {() => (
               <HomePresenter
                 loading={profileLoading}
@@ -280,6 +291,18 @@ class HomeContainer extends React.Component<IProps, IState> {
     return distanceValue
       ? Number.parseFloat((distanceValue * 0.003).toFixed(2))
       : 0;
+  };
+
+  public handleNearbyDrivers = (data: {} | getDrivers) => {
+    if ("GetNearbyDrivers" in data) {
+      const {
+        GetNearbyDrivers: { drivers, ok },
+      } = data;
+      if (ok && drivers) {
+        // tslint:disable-next-line
+        console.log(drivers);
+      }
+    }
   };
 }
 
