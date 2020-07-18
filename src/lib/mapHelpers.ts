@@ -32,7 +32,7 @@ export const getCode = async (address: string) => {
   }
 };
 export const reverseGeoCode = async (lat: number, lng: number) => {
-  const URL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
+  const URL = `https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
   const { data } = await axios(URL);
   if (data.error_message) {
     toast.error(data.error_message);
