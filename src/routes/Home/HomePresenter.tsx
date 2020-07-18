@@ -5,8 +5,15 @@ import React from "react";
 import { MutationFn } from "react-apollo";
 import Helmet from "react-helmet";
 import Sidebar from "react-sidebar";
-import { requestRide, requestRideVariables } from "types/api";
+import RidePopUp from "../../components/RidePopUp";
 import styled from "../../typed-components";
+import {
+  acceptRide,
+  acceptRideVariables,
+  getRides,
+  requestRide,
+  requestRideVariables,
+} from "../../types/api";
 
 const Container = styled.div``;
 
@@ -52,7 +59,9 @@ interface IProps {
   onAddressSubmit: any;
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   price: number;
-  requestRideMutation: MutationFn<requestRide, requestRideVariables>;
+  requestRideMutation?: MutationFn<requestRide, requestRideVariables>;
+  nearbyRide?: getRides | undefined;
+  acceptRideMutation?: MutationFn<acceptRide, acceptRideVariables>;
 }
 
 const HomePresenter: React.SFC<IProps> = ({
@@ -65,6 +74,8 @@ const HomePresenter: React.SFC<IProps> = ({
   onAddressSubmit,
   price,
   requestRideMutation,
+  nearbyRide: { GetNearbyRide } = { GetNearbyRide: null },
+  acceptRideMutation,
 }) => (
   <Container>
     <Helmet>
@@ -114,11 +125,18 @@ const HomePresenter: React.SFC<IProps> = ({
           value={`Request Ride ($${price})`}
         />
       )}
-      <ExtendedButton
-        onClick={onAddressSubmit}
-        disabled={toAddress === ""}
-        value={price ? "Change address" : "Pick Address"}
-      />
+      {GetNearbyRide && GetNearbyRide.ride && (
+        <RidePopUp
+          id={GetNearbyRide.ride.id}
+          pickUpAddress={GetNearbyRide.ride.pickUpAddress}
+          dropOffAddress={GetNearbyRide.ride.dropOffAddress}
+          price={GetNearbyRide.ride.price}
+          distance={GetNearbyRide.ride.distance}
+          passengerName={GetNearbyRide.ride.passenger!.fullName || ""}
+          passengerPhoto={GetNearbyRide.ride.passenger!.profilePhoto || ""}
+          acceptRideMutation={acceptRideMutation}
+        />
+      )}
       <Map ref={mapRef} />
     </Sidebar>
   </Container>

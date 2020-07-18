@@ -1,4 +1,3 @@
-/* eslint-disable no-sequences */
 import { getCode, reverseGeoCode } from "lib/mapHelpers";
 import React from "react";
 import { graphql, Mutation, MutationFn, Query } from "react-apollo";
@@ -7,6 +6,8 @@ import { RouteComponentProps } from "react-router";
 import { toast } from "react-toastify";
 import { USER_PROFILE } from "../../sharedQueries.queries";
 import {
+  acceptRide,
+  acceptRideVariables,
   getDrivers,
   getRides,
   reportMovement,
@@ -16,6 +17,7 @@ import {
   userProfile,
 } from "../../types/api";
 import {
+  ACCEPT_RIDE,
   GET_NEARBY_DRIVERS,
   GET_NEARBY_RIDE,
   REPORT_LOCATION,
@@ -50,6 +52,8 @@ class NearbyQuery extends Query<getDrivers> {}
 class RequestRideMutation extends Mutation<requestRide, requestRideVariables> {}
 
 class GetNearbyRides extends Query<getRides> {}
+
+class AcceptRide extends Mutation<acceptRide, acceptRideVariables> {}
 
 class HomeContainer extends React.Component<IProps, IState> {
   public mapRef: any;
@@ -129,21 +133,23 @@ class HomeContainer extends React.Component<IProps, IState> {
                 {(requestRideMutation) => (
                   <GetNearbyRides query={GET_NEARBY_RIDE} skip={!isDriving}>
                     {({ data: nearbyRide }) => (
-                      // tslint:disable-next-line: no-console
-                      console.log(nearbyRide),
-                      (
-                        <HomePresenter
-                          loading={profileLoading}
-                          isMenuOpen={isMenuOpen}
-                          toggleMenu={this.toggleMenu}
-                          mapRef={this.mapRef}
-                          toAddress={toAddress}
-                          onInputChange={this.onInputChange}
-                          onAddressSubmit={this.onAddressSubmit}
-                          price={price}
-                          requestRideMutation={requestRideMutation}
-                        />
-                      )
+                      <AcceptRide mutation={ACCEPT_RIDE}>
+                        {(acceptRideMutation) => (
+                          <HomePresenter
+                            loading={profileLoading}
+                            isMenuOpen={isMenuOpen}
+                            toggleMenu={this.toggleMenu}
+                            mapRef={this.mapRef}
+                            toAddress={toAddress}
+                            onInputChange={this.onInputChange}
+                            onAddressSubmit={this.onAddressSubmit}
+                            price={price}
+                            nearbyRide={nearbyRide}
+                            requestRideMutation={requestRideMutation}
+                            acceptRideMutation={acceptRideMutation}
+                          />
+                        )}
+                      </AcceptRide>
                     )}
                   </GetNearbyRides>
                 )}
