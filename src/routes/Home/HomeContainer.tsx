@@ -1,3 +1,4 @@
+/* eslint-disable no-sequences */
 import { getCode, reverseGeoCode } from "lib/mapHelpers";
 import React from "react";
 import { graphql, Mutation, MutationFn, Query } from "react-apollo";
@@ -6,13 +7,20 @@ import { RouteComponentProps } from "react-router";
 import { toast } from "react-toastify";
 import { USER_PROFILE } from "../../sharedQueries.queries";
 import {
+  getDrivers,
+  getRides,
   reportMovement,
   reportMovementVariables,
   requestRide,
   requestRideVariables,
   userProfile,
 } from "../../types/api";
-import { REPORT_LOCATION, REQUEST_RIDE } from "./Home.queries";
+import {
+  GET_NEARBY_DRIVERS,
+  GET_NEARBY_RIDE,
+  REPORT_LOCATION,
+  REQUEST_RIDE,
+} from "./Home.queries";
 import HomePresenter from "./HomePresenter";
 
 interface IProps extends RouteComponentProps<any> {
@@ -32,11 +40,16 @@ interface IState {
   duration: string;
   price: number;
   fromAddress: string;
+  isDriving: boolean;
 }
 
 class ProfileQuery extends Query<userProfile> {}
 
+class NearbyQuery extends Query<getDrivers> {}
+
 class RequestRideMutation extends Mutation<requestRide, requestRideVariables> {}
+
+class GetNearbyRides extends Query<getRides> {}
 
 class HomeContainer extends React.Component<IProps, IState> {
   public mapRef: any;
@@ -44,12 +57,14 @@ class HomeContainer extends React.Component<IProps, IState> {
   public userMarker: google.maps.Marker | null = null;
   public toMarker: google.maps.Marker | null = null;
   public directions: google.maps.DirectionsRenderer | null = null;
+  public drivers: google.maps.Marker[];
 
   public state = {
     distance: "",
     distanceValue: 0,
     duration: "",
     fromAddress: "",
+    isDriving: true,
     isMenuOpen: false,
     lat: 0,
     lng: 0,
@@ -62,6 +77,7 @@ class HomeContainer extends React.Component<IProps, IState> {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
+    this.drivers = [];
   }
 
   public componentDidMount() {
@@ -83,38 +99,57 @@ class HomeContainer extends React.Component<IProps, IState> {
       toLat,
       toLng,
       duration,
+      isDriving,
     } = this.state;
     return (
-      <ProfileQuery query={USER_PROFILE}>
+      <ProfileQuery query={USER_PROFILE} onCompleted={this.handleProfileQuery}>
         {({ data, loading: profileLoading }) => (
-          <RequestRideMutation
-            mutation={REQUEST_RIDE}
-            variables={{
-              distance,
-              dropOffAddress: toAddress,
-              dropOffLat: toLat,
-              dropOffLng: toLng,
-              duration,
-              pickUpAddress: fromAddress,
-              pickUpLat: lat,
-              pickUpLng: lng,
-              price,
-            }}
+          <NearbyQuery
+            query={GET_NEARBY_DRIVERS}
+            pollInterval={1000}
+            skip={isDriving}
+            onCompleted={this.handleNearbyDrivers}
           >
-            {(requestRideMutation) => (
-              <HomePresenter
-                loading={profileLoading}
-                isMenuOpen={isMenuOpen}
-                toggleMenu={this.toggleMenu}
-                mapRef={this.mapRef}
-                toAddress={toAddress}
-                onInputChange={this.onInputChange}
-                onAddressSubmit={this.onAddressSubmit}
-                price={price}
-                requestRideMutation={requestRideMutation}
-              />
+            {() => (
+              <RequestRideMutation
+                mutation={REQUEST_RIDE}
+                onCompleted={this.handleRideRequest}
+                variables={{
+                  distance,
+                  dropOffAddress: toAddress,
+                  dropOffLat: toLat,
+                  dropOffLng: toLng,
+                  duration,
+                  pickUpAddress: fromAddress,
+                  pickUpLat: lat,
+                  pickUpLng: lng,
+                  price,
+                }}
+              >
+                {(requestRideMutation) => (
+                  <GetNearbyRides query={GET_NEARBY_RIDE} skip={!isDriving}>
+                    {({ data: nearbyRide }) => (
+                      // tslint:disable-next-line: no-console
+                      console.log(nearbyRide),
+                      (
+                        <HomePresenter
+                          loading={profileLoading}
+                          isMenuOpen={isMenuOpen}
+                          toggleMenu={this.toggleMenu}
+                          mapRef={this.mapRef}
+                          toAddress={toAddress}
+                          onInputChange={this.onInputChange}
+                          onAddressSubmit={this.onAddressSubmit}
+                          price={price}
+                          requestRideMutation={requestRideMutation}
+                        />
+                      )
+                    )}
+                  </GetNearbyRides>
+                )}
+              </RequestRideMutation>
             )}
-          </RequestRideMutation>
+          </NearbyQuery>
         )}
       </ProfileQuery>
     );
@@ -154,6 +189,29 @@ class HomeContainer extends React.Component<IProps, IState> {
     }
   };
 
+  public handleRideRequest = (data: requestRide) => {
+    const { RequestRide } = data;
+    if (RequestRide.ok) {
+      toast.success("Drive requested, finding a driver");
+    } else {
+      toast.error(RequestRide.error);
+    }
+  };
+
+  public handleProfileQuery = (data: userProfile) => {
+    const { GetMyProfile } = data;
+    if (GetMyProfile) {
+      if (GetMyProfile.user) {
+        const {
+          user: { isDriving },
+        } = GetMyProfile;
+        this.setState({
+          isDriving,
+        });
+      }
+    }
+  };
+
   public loadMap = (lat, lng) => {
     const { google } = this.props;
     const maps = google.maps;
@@ -180,6 +238,7 @@ class HomeContainer extends React.Component<IProps, IState> {
       this.handleGeoError,
       watchOptions
     );
+
     const userMarkerOption: google.maps.MarkerOptions = {
       icon: {
         path: maps.SymbolPath.CIRCLE,
@@ -325,6 +384,66 @@ class HomeContainer extends React.Component<IProps, IState> {
     return distanceValue
       ? Number.parseFloat((distanceValue * 0.003).toFixed(2))
       : 0;
+  };
+
+  public handleNearbyDrivers = (data: {} | getDrivers) => {
+    if ("GetNearbyDrivers" in data) {
+      const {
+        GetNearbyDrivers: { drivers, ok },
+      } = data;
+      if (ok && drivers) {
+        for (const driver of drivers) {
+          const existingDriverMarker:
+            | google.maps.Marker
+            | undefined = this.drivers.find(
+            (driverMarker: google.maps.Marker) => {
+              const markerID = driverMarker.get("ID");
+              return markerID === driver!.id;
+            }
+          );
+          if (existingDriverMarker) {
+            this.updateDriverMarker(existingDriverMarker, driver);
+          } else {
+            this.createDriverMarker(driver);
+          }
+        }
+      }
+    }
+  };
+  public createDriverMarker = (driver) => {
+    if (driver && driver.lastLat && driver.lastLng) {
+      const { google } = this.props;
+      const markerOptions: google.maps.MarkerOptions = {
+        icon: {
+          path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          scale: 5,
+        },
+        position: {
+          lat: driver.lastLat,
+          lng: driver.lastLng,
+        },
+      };
+      const newMarker: google.maps.Marker = new google.maps.Marker(
+        markerOptions
+      );
+      if (newMarker) {
+        this.drivers.push(newMarker);
+        newMarker.set("ID", driver!.id);
+        newMarker.setMap(this.map);
+      }
+    }
+    return;
+  };
+
+  public updateDriverMarker = (marker: google.maps.Marker, driver) => {
+    if (driver && driver.lastLat && driver.lastLng) {
+      marker.setPosition({
+        lat: driver.lastLat,
+        lng: driver.lastLng,
+      });
+      marker.setMap(this.map);
+    }
+    return;
   };
 }
 

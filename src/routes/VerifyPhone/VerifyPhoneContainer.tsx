@@ -47,9 +47,9 @@ class VerifyPhoneContainer extends React.Component<IProps, IState> {
             onCompleted={(data) => {
               const { CompletePhoneVerification } = data;
               if (CompletePhoneVerification.ok) {
-                // tslint:disable-next-line
-                console.log(CompletePhoneVerification.token);
                 if (CompletePhoneVerification.token) {
+                  // tslint:disable-next-line
+                  console.log(CompletePhoneVerification.token);
                   logUserIn({
                     variables: {
                       token: CompletePhoneVerification.token,
