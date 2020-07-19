@@ -13,7 +13,7 @@ import {
   getRides,
   requestRide,
   requestRideVariables,
-  //  userProfile,
+  userProfile,
 } from "../../types/api";
 
 const Container = styled.div``;
@@ -61,7 +61,7 @@ interface IProps {
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   price: number;
   requestRideMutation?: MutationFn<requestRide, requestRideVariables>;
-  // data?: userProfile;
+  data?: userProfile;
   nearbyRide?: getRides | undefined;
   acceptRideMutation?: MutationFn<acceptRide, acceptRideVariables>;
 }
@@ -76,7 +76,7 @@ const HomePresenter: React.SFC<IProps> = ({
   onAddressSubmit,
   price,
   requestRideMutation,
-  // data,
+  data,
   nearbyRide: { GetNearbyRide } = { GetNearbyRide: null },
   acceptRideMutation,
 }) => (

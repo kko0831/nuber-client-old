@@ -137,11 +137,18 @@ class HomeContainer extends React.Component<IProps, IState> {
                     {({ subscribeToMore, data: nearbyRide }) => {
                       const rideSubscriptionOptions: SubscribeToMoreOptions = {
                         document: SUBSCRIBE_NEARBY_RIDE,
-                        updateQuery: (prev, result) => {
-                          // tslint:disable-next-line: no-console
-                          console.log(prev);
-                          // tslint:disable-next-line: no-console
-                          console.log(result);
+                        updateQuery: (prev, { subscriptionData }) => {
+                          if (!subscriptionData.data) {
+                            return prev;
+                          }
+                          const updateData = Object.assign({}, prev, {
+                            GetNearbyRide: {
+                              ...prev.GetNearbyRide,
+                              ride:
+                                subscriptionData.data.NearbyRideSubscription,
+                            },
+                          });
+                          return updateData;
                         },
                       };
                       subscribeToMore(rideSubscriptionOptions);
@@ -157,7 +164,7 @@ class HomeContainer extends React.Component<IProps, IState> {
                               onInputChange={this.onInputChange}
                               onAddressSubmit={this.onAddressSubmit}
                               price={price}
-                              // data={data}
+                              data={data}
                               nearbyRide={nearbyRide}
                               requestRideMutation={requestRideMutation}
                               acceptRideMutation={acceptRideMutation}
