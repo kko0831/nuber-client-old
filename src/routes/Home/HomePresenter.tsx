@@ -13,6 +13,7 @@ import {
   getRides,
   requestRide,
   requestRideVariables,
+  userProfile,
 } from "../../types/api";
 
 const Container = styled.div``;
@@ -60,6 +61,7 @@ interface IProps {
   onInputChange: React.ChangeEventHandler<HTMLInputElement>;
   price: number;
   requestRideMutation?: MutationFn<requestRide, requestRideVariables>;
+  data?: userProfile;
   nearbyRide?: getRides | undefined;
   acceptRideMutation?: MutationFn<acceptRide, acceptRideVariables>;
 }
@@ -74,72 +76,166 @@ const HomePresenter: React.SFC<IProps> = ({
   onAddressSubmit,
   price,
   requestRideMutation,
-  nearbyRide: { GetNearbyRide } = { GetNearbyRide: null },
+  data,
+  nearbyRide,
   acceptRideMutation,
-}) => (
-  <Container>
-    <Helmet>
-      <title>Home | Number</title>
-    </Helmet>
-    <Sidebar
-      sidebar={<Menu />}
-      open={isMenuOpen}
-      onSetOpen={toggleMenu}
-      styles={{
-        sidebar: {
-          backgroundColor: "white",
-          width: "80%",
-          zIndex: "10",
-        },
-      }}
-    >
-      {!loading && (
-        <MenuButton onClick={toggleMenu}>
-          <svg
-            width="24"
-            height="24"
-            xmlns="http://www.w3.org/2000/svg"
-            fillRule="evenodd"
-            clipRule="evenodd"
+}) => {
+  if (
+    data &&
+    data.GetMyProfile &&
+    data.GetMyProfile.ok &&
+    data.GetMyProfile.user
+  ) {
+    if (
+      nearbyRide &&
+      nearbyRide.GetNearbyRide &&
+      nearbyRide.GetNearbyRide.ok &&
+      nearbyRide.GetNearbyRide.ride
+    ) {
+      const ride = nearbyRide.GetNearbyRide.ride;
+      const user = data.GetMyProfile.user;
+      return (
+        <Container>
+          <Helmet>
+            <title>Home | Nuber</title>
+          </Helmet>
+          <Sidebar
+            sidebar={<Menu />}
+            open={isMenuOpen}
+            onSetOpen={toggleMenu}
+            styles={{
+              sidebar: {
+                backgroundColor: "white",
+                width: "80%",
+                zIndex: "10",
+              },
+            }}
           >
-            <path
-              d="M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z"
-              fill="#1040e2"
-            />
-            <path d="M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z" />
-          </svg>
-        </MenuButton>
-      )}
-      <AddressBar
-        name={"toAddress"}
-        onChange={onInputChange}
-        value={toAddress}
-        onBlur={() => ""}
-      />
-      {!price ? (
-        false
-      ) : (
-        <RequestButton
-          onClick={requestRideMutation}
-          disabled={toAddress === ""}
-          value={`Request Ride ($${price})`}
-        />
-      )}
-      {GetNearbyRide && GetNearbyRide.ride && (
-        <RidePopUp
-          id={GetNearbyRide.ride.id}
-          pickUpAddress={GetNearbyRide.ride.pickUpAddress}
-          dropOffAddress={GetNearbyRide.ride.dropOffAddress}
-          price={GetNearbyRide.ride.price}
-          distance={GetNearbyRide.ride.distance}
-          passengerName={GetNearbyRide.ride.passenger!.fullName || ""}
-          passengerPhoto={GetNearbyRide.ride.passenger!.profilePhoto || ""}
-          acceptRideMutation={acceptRideMutation}
-        />
-      )}
-      <Map ref={mapRef} />
-    </Sidebar>
-  </Container>
-);
+            {!loading && (
+              <MenuButton onClick={toggleMenu}>
+                <svg
+                  width="24"
+                  height="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                >
+                  <path
+                    d="M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z"
+                    fill="#1040e2"
+                  />
+                  <path d="M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z" />
+                </svg>
+              </MenuButton>
+            )}
+            {user && !user.isDriving && (
+              <React.Fragment>
+                <AddressBar
+                  name={"toAddress"}
+                  onChange={onInputChange}
+                  value={toAddress}
+                  onBlur={() => ""}
+                />
+                <ExtendedButton
+                  onClick={onAddressSubmit}
+                  disabled={toAddress === ""}
+                  value={price ? "Change address" : "Pick Address"}
+                />
+              </React.Fragment>
+            )}
+            {!price ? (
+              false
+            ) : (
+              <RequestButton
+                onClick={requestRideMutation}
+                disabled={toAddress === ""}
+                value={`Request Ride ($${price})`}
+              />
+            )}
+            {ride && (
+              <RidePopUp
+                id={ride.id}
+                pickUpAddress={ride.pickUpAddress}
+                dropOffAddress={ride.dropOffAddress}
+                price={ride.price}
+                distance={ride.distance}
+                passengerName={ride.passenger.fullName!}
+                passengerPhoto={ride.passenger.profilePhoto!}
+                acceptRideMutation={acceptRideMutation}
+              />
+            )}
+            <Map ref={mapRef} />
+          </Sidebar>
+        </Container>
+      );
+    } else {
+      const user = data.GetMyProfile.user;
+      return (
+        <Container>
+          <Helmet>
+            <title>Home | Nuber</title>
+          </Helmet>
+          <Sidebar
+            sidebar={<Menu />}
+            open={isMenuOpen}
+            onSetOpen={toggleMenu}
+            styles={{
+              sidebar: {
+                backgroundColor: "white",
+                width: "80%",
+                zIndex: "10",
+              },
+            }}
+          >
+            {!loading && (
+              <MenuButton onClick={toggleMenu}>
+                <svg
+                  width="24"
+                  height="24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                >
+                  <path
+                    d="M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z"
+                    fill="#1040e2"
+                  />
+                  <path d="M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z" />
+                </svg>
+              </MenuButton>
+            )}
+            {user && !user.isDriving && (
+              <React.Fragment>
+                <AddressBar
+                  name={"toAddress"}
+                  onChange={onInputChange}
+                  value={toAddress}
+                  onBlur={null}
+                />
+                <ExtendedButton
+                  onClick={onAddressSubmit}
+                  disabled={toAddress === ""}
+                  value={price ? "Change address" : "Pick Address"}
+                />
+              </React.Fragment>
+            )}
+            {!price ? (
+              false
+            ) : (
+              <RequestButton
+                onClick={requestRideMutation}
+                disabled={toAddress === ""}
+                value={`Request Ride ($${price})`}
+              />
+            )}
+            <Map ref={mapRef} />
+          </Sidebar>
+        </Container>
+      );
+    }
+  } else {
+    return <div>can't get user</div>;
+  }
+};
 
 export default HomePresenter;

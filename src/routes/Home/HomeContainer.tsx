@@ -1,3 +1,4 @@
+import { SubscribeToMoreOptions } from "apollo-client";
 import { getCode, reverseGeoCode } from "lib/mapHelpers";
 import React from "react";
 import { graphql, Mutation, MutationFn, Query } from "react-apollo";
@@ -22,6 +23,7 @@ import {
   GET_NEARBY_RIDE,
   REPORT_LOCATION,
   REQUEST_RIDE,
+  SUBSCRIBE_NEARBY_RIDE,
 } from "./Home.queries";
 import HomePresenter from "./HomePresenter";
 
@@ -132,25 +134,38 @@ class HomeContainer extends React.Component<IProps, IState> {
               >
                 {(requestRideMutation) => (
                   <GetNearbyRides query={GET_NEARBY_RIDE} skip={!isDriving}>
-                    {({ data: nearbyRide }) => (
-                      <AcceptRide mutation={ACCEPT_RIDE}>
-                        {(acceptRideMutation) => (
-                          <HomePresenter
-                            loading={profileLoading}
-                            isMenuOpen={isMenuOpen}
-                            toggleMenu={this.toggleMenu}
-                            mapRef={this.mapRef}
-                            toAddress={toAddress}
-                            onInputChange={this.onInputChange}
-                            onAddressSubmit={this.onAddressSubmit}
-                            price={price}
-                            nearbyRide={nearbyRide}
-                            requestRideMutation={requestRideMutation}
-                            acceptRideMutation={acceptRideMutation}
-                          />
-                        )}
-                      </AcceptRide>
-                    )}
+                    {({ subscribeToMore, data: nearbyRide }) => {
+                      const rideSubscriptionOptions: SubscribeToMoreOptions = {
+                        document: SUBSCRIBE_NEARBY_RIDE,
+                        updateQuery: (prev, result) => {
+                          // tslint:disable-next-line: no-console
+                          console.log(prev);
+                          // tslint:disable-next-line: no-console
+                          console.log(result);
+                        },
+                      };
+                      subscribeToMore(rideSubscriptionOptions);
+                      return (
+                        <AcceptRide mutation={ACCEPT_RIDE}>
+                          {(acceptRideMutation) => (
+                            <HomePresenter
+                              loading={profileLoading}
+                              isMenuOpen={isMenuOpen}
+                              toggleMenu={this.toggleMenu}
+                              mapRef={this.mapRef}
+                              toAddress={toAddress}
+                              onInputChange={this.onInputChange}
+                              onAddressSubmit={this.onAddressSubmit}
+                              price={price}
+                              // data={data}
+                              nearbyRide={nearbyRide}
+                              requestRideMutation={requestRideMutation}
+                              acceptRideMutation={acceptRideMutation}
+                            />
+                          )}
+                        </AcceptRide>
+                      );
+                    }}
                   </GetNearbyRides>
                 )}
               </RequestRideMutation>
