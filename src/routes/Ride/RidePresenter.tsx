@@ -1,7 +1,13 @@
 import Button from "components/Button";
 import React from "react";
+import { MutationFn } from "react-apollo";
 import styled from "../../typed-components";
-import { getRide } from "../../types/api";
+import {
+  getRide,
+  updateRide,
+  updateRideVariables,
+  userProfile,
+} from "../../types/api";
 
 const defaultProfile =
   "https://user-images.githubusercontent.com/11402468/58876263-7ee5fa80-8708-11e9-8eb7-b5ef5f2966d0.jpeg";
@@ -46,14 +52,65 @@ const ExtendedButton = styled(Button)`
 
 interface IProps {
   rideData?: getRide;
+  userData?: userProfile;
+  updateRideMutation: MutationFn<updateRide, updateRideVariables>;
 }
 
-const RidePresenter: React.SFC<IProps> = ({ rideData }) => {
-  if (rideData && rideData.GetRide && rideData.GetRide.ok) {
+const renderStatusButton = ({ ride, user, updateRideMutation }) => {
+  // tslint:disable-next-line: no-console
+  console.log(ride);
+  if (ride.driver && user && ride.driver.id === user.id) {
+    if (ride.status === "ACCEPTED") {
+      return (
+        <ExtendedButton
+          value="Picked Up"
+          onClick={() => {
+            updateRideMutation({
+              variables: {
+                rideId: ride.id,
+                status: "ONROUTE",
+              },
+            });
+          }}
+        />
+      );
+    } else if (ride.status === "ONROUTE") {
+      return (
+        <ExtendedButton
+          value="Finished"
+          onClick={() => {
+            updateRideMutation({
+              variables: {
+                rideId: ride.id,
+                status: "FINISHED",
+              },
+            });
+          }}
+        />
+      );
+    }
+  }
+  return false;
+};
+
+const RidePresenter: React.SFC<IProps> = ({
+  rideData,
+  userData,
+  updateRideMutation,
+}) => {
+  if (
+    rideData &&
+    rideData.GetRide &&
+    rideData.GetRide.ok &&
+    userData &&
+    userData.GetMyProfile &&
+    userData.GetMyProfile.ok
+  ) {
     const ride = rideData.GetRide.ride;
+    const user = userData.GetMyProfile.user;
     return (
       <Container>
-        {ride && (
+        {ride && user && (
           <React.Fragment>
             <Title>Passenger</Title>
             {ride.passenger && (
@@ -84,7 +141,7 @@ const RidePresenter: React.SFC<IProps> = ({ rideData }) => {
             <Title>Status</Title>
             <Data>{ride.status}</Data>
             <Buttons>
-              <ExtendedButton value={"Picked Up"} onClick={() => ""} />
+              {renderStatusButton({ user, ride, updateRideMutation })}
             </Buttons>
           </React.Fragment>
         )}

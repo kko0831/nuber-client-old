@@ -1,11 +1,22 @@
 import React from "react";
-import { Query } from "react-apollo";
+import { Mutation, Query } from "react-apollo";
 import { RouteComponentProps } from "react-router-dom";
-import { getRide, getRideVariables } from "../../types/api";
-import { GET_RIDE } from "./Ride.queries";
+import { USER_PROFILE } from "../../sharedQueries.queries";
+import {
+  getRide,
+  getRideVariables,
+  updateRide,
+  updateRideVariables,
+  userProfile,
+} from "../../types/api";
+import { GET_RIDE, UPDATE_RIDE_STATUS } from "./Ride.queries";
 import RidePresenter from "./RidePresenter";
 
 class RideQuery extends Query<getRide, getRideVariables> {}
+
+class ProfileQuery extends Query<userProfile> {}
+
+class RideUpdate extends Mutation<updateRide, updateRideVariables> {}
 
 interface IProps extends RouteComponentProps<any> {}
 
@@ -29,9 +40,34 @@ class RideContainer extends React.Component<IProps> {
       },
     } = this.props;
     return (
-      <RideQuery query={GET_RIDE} variables={{ rideId: parseInt(rideId, 10) }}>
-        {({ data: rideData }) => <RidePresenter rideData={rideData} />}
-      </RideQuery>
+      <ProfileQuery query={USER_PROFILE}>
+        {({ data: userData }) => (
+          <RideQuery
+            query={GET_RIDE}
+            variables={{ rideId: parseInt(rideId, 10) }}
+          >
+            {({ data: rideData }) => (
+              <RideUpdate
+                mutation={UPDATE_RIDE_STATUS}
+                refetchQueries={[
+                  {
+                    query: GET_RIDE,
+                    variables: { rideId: parseInt(rideId, 10) },
+                  },
+                ]}
+              >
+                {(updateRideMutation) => (
+                  <RidePresenter
+                    rideData={rideData}
+                    userData={userData}
+                    updateRideMutation={updateRideMutation}
+                  />
+                )}
+              </RideUpdate>
+            )}
+          </RideQuery>
+        )}
+      </ProfileQuery>
     );
   }
 }

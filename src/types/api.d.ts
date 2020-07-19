@@ -350,6 +350,31 @@ export interface getRideVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: updateRide
+// ====================================================
+
+export interface updateRide_UpdateRideStatus {
+  __typename: "UpdateRideStatusResponse";
+  ok: boolean;
+  error: string | null;
+  rideId: number | null;
+}
+
+export interface updateRide {
+  UpdateRideStatus: updateRide_UpdateRideStatus;
+}
+
+export interface updateRideVariables {
+  rideId: number;
+  status: StatusOptions;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL mutation operation: facebookConnect
 // ====================================================
 
@@ -463,6 +488,14 @@ export interface getPlaces {
 //==============================================================
 // START Enums and Input Objects
 //==============================================================
+
+export enum StatusOptions {
+  ACCEPTED = "ACCEPTED",
+  CANCELED = "CANCELED",
+  FINISHED = "FINISHED",
+  ONROUTE = "ONROUTE",
+  REQUESTING = "REQUESTING",
+}
 
 //==============================================================
 // END Enums and Input Objects
