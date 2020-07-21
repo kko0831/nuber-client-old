@@ -1,6 +1,7 @@
 import Button from "components/Button";
 import React from "react";
 import { MutationFn } from "react-apollo";
+import { Link } from "react-router-dom";
 import styled from "../../typed-components";
 import {
   getRide,
@@ -142,6 +143,11 @@ const RidePresenter: React.SFC<IProps> = ({
             <Data>{ride.status}</Data>
             <Buttons>
               {renderStatusButton({ user, ride, updateRideMutation })}
+              {ride.status !== "REQUESTING" && (
+                <Link to={`/chat/${ride.chatId}`}>
+                  <ExtendedButton value="Chat" onClick={null} />
+                </Link>
+              )}
             </Buttons>
           </React.Fragment>
         )}
