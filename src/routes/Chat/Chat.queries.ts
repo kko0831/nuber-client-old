@@ -1,4 +1,4 @@
-import { gql } from 'apollo-boost';
+import { gql } from "apollo-boost";
 
 export const GET_CHAT = gql`
   query getChat($chatId: Int!) {
@@ -13,6 +13,20 @@ export const GET_CHAT = gql`
           text
           userId
         }
+      }
+    }
+  }
+`;
+
+export const SEND_MESSAGE = gql`
+  mutation sendMessage($text: String!, $chatId: Int!) {
+    SendChatMessage(text: $text, chatId: $chatId) {
+      ok
+      error
+      message {
+        id
+        text
+        userId
       }
     }
   }
