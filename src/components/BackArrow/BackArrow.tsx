@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styled from "../../typed-components";
 
 const Container = styled.div`
-  transform: saclae(0.8);
+  transform: scale(0.8);
 `;
 
 interface IProps {
