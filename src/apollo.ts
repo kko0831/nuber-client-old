@@ -54,9 +54,9 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       toast.error(`Unexpected error: ${message}`);
     });
   }
-  if (networkError) {
+  /* if (networkError) {
     toast.error(`Network error: ${networkError}`);
-  }
+  } */
 });
 
 const localStateLink = withClientState({
