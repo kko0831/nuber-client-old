@@ -384,7 +384,8 @@ class HomeContainer extends React.Component<IProps, IState> {
     const directionsOptions: google.maps.DirectionsRequest = {
       destination: to,
       origin: from,
-      travelMode: google.maps.TravelMode.DRIVING,
+      travelMode: google.maps.TravelMode.TRANSIT,
+      /* google.maps.TravelMode.DRIVING */
     };
     directionsService.route(directionsOptions, this.handleRouteRequest);
   };
