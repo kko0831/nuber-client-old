@@ -20,14 +20,13 @@ interface IProps {
 }
 
 const PlacesPresenter: React.SFC<IProps> = ({ data, loading }) => {
-  const GetMyPlaces = data;
   if (
-    GetMyPlaces &&
-    GetMyPlaces.GetMyPlaces &&
-    GetMyPlaces.GetMyPlaces.ok &&
-    GetMyPlaces.GetMyPlaces.places
+    data &&
+    data.GetMyPlaces &&
+    data.GetMyPlaces.ok &&
+    data.GetMyPlaces.places
   ) {
-    const places = GetMyPlaces.GetMyPlaces.places;
+    const places = data.GetMyPlaces.places;
     return (
       <React.Fragment>
         <Helmet>

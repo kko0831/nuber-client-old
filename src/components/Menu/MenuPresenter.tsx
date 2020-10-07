@@ -87,9 +87,8 @@ const MenuPresenter: React.SFC<IProps> = ({
   loading,
   ToggleDrivingMutation,
 }) => {
-  const GetMyProfile = data;
-  if (GetMyProfile) {
-    const response: userProfile_GetMyProfile = GetMyProfile.GetMyProfile;
+  if (data) {
+    const response: userProfile_GetMyProfile = data.GetMyProfile;
     if (response && response.ok && response.user) {
       const user = response.user;
       return (

@@ -57,14 +57,8 @@ const SettingsPresenter: React.SFC<IProps> = ({
   userDataLoading,
   placesLoading,
 }) => {
-  const GetMyProfile = userData;
-  const GetMyPlaces = placesData;
-  if (
-    GetMyProfile &&
-    GetMyProfile.GetMyProfile &&
-    GetMyProfile.GetMyProfile.ok
-  ) {
-    const user = GetMyProfile.GetMyProfile.user;
+  if (userData && userData.GetMyProfile && userData.GetMyProfile.ok) {
+    const user = userData.GetMyProfile.user;
     return (
       <React.Fragment>
         <Helmet>
@@ -88,11 +82,11 @@ const SettingsPresenter: React.SFC<IProps> = ({
               )}
           </GridLink>
           {!placesLoading &&
-            GetMyPlaces &&
-            GetMyPlaces.GetMyPlaces &&
-            GetMyPlaces.GetMyPlaces.ok &&
-            GetMyPlaces.GetMyPlaces.places &&
-            GetMyPlaces.GetMyPlaces.places.map((place) => (
+            placesData &&
+            placesData.GetMyPlaces &&
+            placesData.GetMyPlaces.ok &&
+            placesData.GetMyPlaces.places &&
+            placesData.GetMyPlaces.places.map((place) => (
               <Place
                 key={place!.id}
                 id={place!.id}
