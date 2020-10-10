@@ -4,7 +4,7 @@ import React from "react";
 import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
 import styled from "../../typed-components";
-import { getPlaces } from "../../types/api";
+import { getPlaces, getPlaces_GetMyPlaces_places } from "../../types/api";
 
 const Container = styled.div`
   padding: 0 40px;
@@ -37,7 +37,8 @@ const PlacesPresenter: React.SFC<IProps> = ({ data, loading }) => {
           {!loading && places && places.length === 0 && "You have no places"}
           {!loading &&
             places &&
-            places.map((place) => (
+            places.sort(
+              (a: getPlaces_GetMyPlaces_places, b: getPlaces_GetMyPlaces_places) =>( a.id - b.id )).map((place) => (
               <Place
                 key={place!.id}
                 id={place!.id}

@@ -5,7 +5,7 @@ import { MutationFn } from "react-apollo";
 import Helmet from "react-helmet";
 import { Link } from "react-router-dom";
 import styled from "../../typed-components";
-import { getPlaces, userProfile } from "../../types/api";
+import { getPlaces, getPlaces_GetMyPlaces_places, userProfile } from "../../types/api";
 
 const Container = styled.div`
   padding: 0px 40px;
@@ -86,7 +86,8 @@ const SettingsPresenter: React.SFC<IProps> = ({
             placesData.GetMyPlaces &&
             placesData.GetMyPlaces.ok &&
             placesData.GetMyPlaces.places &&
-            placesData.GetMyPlaces.places.map((place) => (
+            placesData.GetMyPlaces.places.sort(
+              (a: getPlaces_GetMyPlaces_places, b: getPlaces_GetMyPlaces_places) =>( a.id - b.id )).map((place) => (
               <Place
                 key={place!.id}
                 id={place!.id}
@@ -94,7 +95,8 @@ const SettingsPresenter: React.SFC<IProps> = ({
                 name={place!.name}
                 address={place!.address}
               />
-            ))}
+            ))
+            }
           <SLink to={"/places"}>Go to Places</SLink>
           <FakeLink onClick={logUserOut as any}>Log Out</FakeLink>
         </Container>
