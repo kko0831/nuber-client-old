@@ -2,7 +2,7 @@ import { SubscribeToMoreOptions } from "apollo-client";
 import { getCode, reverseGeoCode } from "lib/mapHelpers";
 import React from "react";
 import { graphql, Mutation, MutationFn, Query } from "react-apollo";
-import ReactDOM from "react-dom";
+// import ReactDOM from "react-dom";
 import { RouteComponentProps } from "react-router";
 import { toast } from "react-toastify";
 import { USER_PROFILE } from "../../sharedQueries.queries";
@@ -248,10 +248,12 @@ class HomeContainer extends React.Component<IProps, IState> {
   public loadMap = (lat, lng) => {
     const { google } = this.props;
     const maps = google.maps;
-    const mapNode = ReactDOM.findDOMNode(this.mapRef.current);
+    // const mapNode = ReactDOM.findDOMNode(this.mapRef.current);
+    // // tslint:disable-next-line: no-console
+    // console.log("true or false", mapNode === this.mapRef.current)
+    const mapNode = this.mapRef.current;
     if (!mapNode) {
-      this.loadMap(lat, lng);
-      return;
+      toast.error("mapNode is not accessed")
     }
     const mapConfig: google.maps.MapOptions = {
       center: {
