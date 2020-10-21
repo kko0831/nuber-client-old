@@ -13,7 +13,7 @@ interface IState {
 }
 
 interface IProps
-  extends RouteComponentProps<{ phone?: string }, any, { phone?: string }> {}
+  extends RouteComponentProps<{ phone: string }, any, { phone: string }> {}
 
 class VerifyMutation extends Mutation<verfiyPhone, verfiyPhoneVariables> {}
 

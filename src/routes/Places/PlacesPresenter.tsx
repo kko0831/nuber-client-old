@@ -38,7 +38,7 @@ const PlacesPresenter: React.SFC<IProps> = ({ data, loading }) => {
           {!loading &&
             places &&
             places.sort(
-              (a: getPlaces_GetMyPlaces_places, b: getPlaces_GetMyPlaces_places) =>( a.id - b.id )).map((place) => (
+              (a: getPlaces_GetMyPlaces_places | null, b: getPlaces_GetMyPlaces_places | null) =>( a!.id - b!.id )).map((place) => (
               <Place
                 key={place!.id}
                 id={place!.id}
