@@ -1,6 +1,6 @@
 import { SubscribeToMoreOptions } from "apollo-client";
 import { getCode, reverseGeoCode } from "lib/mapHelpers";
-import React from "react";
+import React, { RefObject } from "react";
 import { graphql, Mutation, MutationFn, Query } from "react-apollo";
 // import ReactDOM from "react-dom";
 import { RouteComponentProps } from "react-router";
@@ -58,7 +58,7 @@ class GetNearbyRides extends Query<getRides> {}
 class AcceptRide extends Mutation<acceptRide, acceptRideVariables> {}
 
 class HomeContainer extends React.Component<IProps, IState> {
-  public mapRef: any;
+  public mapRef: RefObject<HTMLDivElement>;
   public map: google.maps.Map | null = null;
   public userMarker: google.maps.Marker | null = null;
   public toMarker: google.maps.Marker | null = null;
