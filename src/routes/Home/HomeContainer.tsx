@@ -64,6 +64,7 @@ class HomeContainer extends React.Component<IProps, IState> {
   public toMarker: google.maps.Marker | null = null;
   public directions: google.maps.DirectionsRenderer | null = null;
   public drivers: google.maps.Marker[];
+  public directionsService: google.maps.DirectionsService | null = null;
 
   public state = {
     distance: "",
@@ -264,6 +265,15 @@ class HomeContainer extends React.Component<IProps, IState> {
       zoom: 13,
     };
     this.map = new maps.Map(mapNode, mapConfig);
+    this.directionsService = new google.maps.DirectionsService();
+    const renderOptions: google.maps.DirectionsRendererOptions = {
+      polylineOptions: {
+        strokeColor: "#000",
+      },
+      suppressMarkers: true,
+    };
+
+    this.directions = new google.maps.DirectionsRenderer(renderOptions);
 
     const watchOptions: PositionOptions = {
       enableHighAccuracy: true,
@@ -290,7 +300,6 @@ class HomeContainer extends React.Component<IProps, IState> {
 
   public handleGeoWatchSuccess: PositionCallback = (position: Position) => {
     // tslint:disable-next-line
-    console.log(position);
     const { reportLocation } = this.props;
     const {
       coords: { latitude: lat, longitude: lng },
@@ -372,21 +381,21 @@ class HomeContainer extends React.Component<IProps, IState> {
     if (this.directions) {
       this.directions.setMap(null);
     }
-    const renderOptions: google.maps.DirectionsRendererOptions = {
-      polylineOptions: {
-        strokeColor: "#000",
-      },
-      suppressMarkers: true,
-    };
-
-    this.directions = new google.maps.DirectionsRenderer(renderOptions);
-    const directionsService: google.maps.DirectionsService = new google.maps.DirectionsService();
+    if (!this.directionsService || !this.directions) {
+      toast.error("No direction service or no direction renderer.")
+    }
+    
+    const directionsService: google.maps.DirectionsService = this.directionsService!;
     const from = new google.maps.LatLng(lat, lng);
     const to = new google.maps.LatLng(toLat, toLng);
+    // tslint:disable-next-line: no-console
+    console.log("lat lng toLat toLng: ", lat, lng, toLat, toLng)
+    // tslint:disable-next-line: no-console
+    console.log("from: ", from)
     const directionsOptions: google.maps.DirectionsRequest = {
       destination: to,
       origin: from,
-      travelMode: google.maps.TravelMode.TRANSIT,
+      travelMode: google.maps.TravelMode.DRIVING,
       /* google.maps.TravelMode.DRIVING */
     };
     directionsService.route(directionsOptions, this.handleRouteRequest);
@@ -396,6 +405,10 @@ class HomeContainer extends React.Component<IProps, IState> {
     result: google.maps.DirectionsResult,
     status: google.maps.DirectionsStatus
   ) => {
+    // tslint:disable-next-line: no-console
+    console.log("result: ", result)
+    // tslint:disable-next-line: no-console
+    console.log("status: ", status)
     const { google } = this.props;
     if (status === google.maps.DirectionsStatus.OK) {
       const { routes } = result;
