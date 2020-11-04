@@ -304,6 +304,10 @@ class HomeContainer extends React.Component<IProps, IState> {
     const {
       coords: { latitude: lat, longitude: lng },
     } = position;
+    this.setState({
+      lat,
+      lng,
+    });
     this.userMarker!.setPosition({ lat, lng });
     this.map!.panTo({ lat, lng });
     reportLocation({
